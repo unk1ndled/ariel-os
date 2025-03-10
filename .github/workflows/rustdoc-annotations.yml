@@ -1,0 +1,54 @@
+name: Rustdoc Annotations
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  rustdoc:
+    name: Run Rustdoc and Annotate Warnings
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run rustdoc
+        run: |
+          cargo clean
+          cargo doc --document-private-items 2> rustdoc_warnings.log || true
+
+      - name: Parse and Annotate Rustdoc Warnings
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const warnings = fs.readFileSync('rustdoc_warnings.log', 'utf8');
+            const annotationRegex = /(.+?):(\d+):(\d+):\s+warning:\s+(.*)/g;
+
+            let match;
+            while ((match = annotationRegex.exec(warnings)) !== null) {
+              const [, file, line, col, message] = match;
+              github.rest.checks.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: 'Rustdoc Annotations',
+                head_sha: context.payload.pull_request.head.sha,
+                output: {
+                  title: 'Rustdoc Warning',
+                  summary: message,
+                  annotations: [
+                    {
+                      path: file,
+                      start_line: parseInt(line, 10),
+                      end_line: parseInt(line, 10),
+                      annotation_level: 'warning',
+                      message,
+                    },
+                  ],
+                },
+              });
+            }
