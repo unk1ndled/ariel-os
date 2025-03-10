@@ -2,8 +2,9 @@ name: Rustdoc Annotations
 
 on:
   pull_request:
+    # change this later
     branches:
-      - main
+      - rustdoc-annotations-action
 
 jobs:
   rustdoc:
