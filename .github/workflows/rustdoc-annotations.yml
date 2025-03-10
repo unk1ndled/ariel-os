@@ -1,10 +1,11 @@
 name: Rustdoc Annotations
 
 on:
+  push:
+
   pull_request:
-    # change this later
     branches:
-      - rustdoc-annotations-action
+      - main
 
 jobs:
   rustdoc:
