@@ -20,7 +20,7 @@ jobs:
       - name: Run rustdoc
         run: |
           cargo clean
-          cargo doc --document-private-items 2> rustdoc_warnings.log || true
+          cargo doc --color=never --document-private-items 2> rustdoc_warnings.log || true
 
       - name: Parse and Annotate Rustdoc Warnings
         uses: actions/github-script@v7

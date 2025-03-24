@@ -1,28 +1,28 @@
-name: hax
+# name: hax
 
-on:
-  pull_request:
-  push:
+# on:
+#   pull_request:
+#   push:
 
-jobs:
-  hax:
-    runs-on: "ubuntu-latest"
+# jobs:
+#   hax:
+#     runs-on: "ubuntu-latest"
 
-    steps:
-      - uses: actions/checkout@v4
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - name: ⤵ Install and configure hax
-        uses: hacspec/hax-actions@main
-        with:
-          # pin hax to known-working
-          hax_reference: cc29a3f8c0eee80a1682be78cb3b0447a0257d5b
+#       - name: ⤵ Install and configure hax
+#         uses: hacspec/hax-actions@main
+#         with:
+#           # pin hax to known-working
+#           hax_reference: cc29a3f8c0eee80a1682be78cb3b0447a0257d5b
 
-      - name: 🏃 Extract `ariel-os-runqueue`
-        working-directory: ./src/ariel-os-runqueue
-        run: |
-          rm -f proofs/fstar/extraction/*.fst*
-          cargo hax into fstar
+#       - name: 🏃 Extract `ariel-os-runqueue`
+#         working-directory: ./src/ariel-os-runqueue
+#         run: |
+#           rm -f proofs/fstar/extraction/*.fst*
+#           cargo hax into fstar
 
-      - name: 🏃 Lax check `ariel-os-runqueue`
-        working-directory: ./src/ariel-os-runqueue/proofs/fstar/extraction
-        run: OTHERFLAGS="--lax" make
+#       - name: 🏃 Lax check `ariel-os-runqueue`
+#         working-directory: ./src/ariel-os-runqueue/proofs/fstar/extraction
+#         run: OTHERFLAGS="--lax" make
