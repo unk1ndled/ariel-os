@@ -2,7 +2,6 @@ name: Rustdoc Annotations
 
 on:
   push:
-
   pull_request:
     branches:
       - main
@@ -28,12 +27,23 @@ jobs:
         with:
           script: |
             const fs = require('fs');
+            const path = require('path');
+
             const warnings = fs.readFileSync('rustdoc_warnings.log', 'utf8');
             const annotationRegex = /(.+?):(\d+):(\d+):\s+warning:\s+(.*)/g;
 
             let match;
+            const annotations = [];
             while ((match = annotationRegex.exec(warnings)) !== null) {
               const [, file, line, col, message] = match;
+              annotations.push({
+                path: file,
+                start_line: parseInt(line, 10),
+                end_line: parseInt(line, 10),
+                annotation_level: 'warning',
+                message,
+              });
+
               github.rest.checks.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -54,8 +64,12 @@ jobs:
                 },
               });
             }
-      - name: Upload Rustdoc Warnings Log
+
+            // Save parsed annotations to a JSON file
+            fs.writeFileSync('rustdoc_parsed_warnings.json', JSON.stringify(annotations, null, 2));
+
+      - name: Upload Parsed Rustdoc Warnings
         uses: actions/upload-artifact@v4
         with:
-          name: rustdoc-warnings
-          path: rustdoc_warnings.log
+          name: rustdoc-parsed-warnings
+          path: rustdoc_parsed_
